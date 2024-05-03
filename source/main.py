@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import telegram_send
-import chatListen
+import ChatListener
 import AppConfig
 import time
 
@@ -13,7 +13,7 @@ def telegram_sendMessage(message):
 
 def AppInit() -> None:
     telegram_sendMessage("Bot on")
-    chatListen.init(AppConfig.AppConfig['telegram_token'])
+    ChatListener.init(AppConfig.AppConfig['telegram_token'])
 
 
 def main() -> None:
