@@ -3,7 +3,6 @@ import subprocess
 import sys
 import signal
 import CameraStreamer
-import threading
 import time
 
 IMAGE_NAME = "/home/pi/Pictures/telegram_request.jpg"
@@ -66,11 +65,7 @@ def Handle_Received_Photo(update):
 
 
 def Handle_Received_VideoStart(update):
-    global videoStreamingThread
-    videoStreamingThread = threading.Thread(target=CameraStreamer.Start)
-    videoStreamingThread.start()
-
-    update.message.reply_text("Video stream started")
+    CameraStreamer.Start()
     try:
         videoUrl = CameraStreamer.GetUrl()
         update.message.reply_text("url: "+ videoUrl)
@@ -81,21 +76,7 @@ def Handle_Received_VideoStart(update):
 
 
 def Handle_Received_VideoStop(update):
-    global videoStreamingThread
-
-    if videoStreamingThread == None:
-        update.message.reply_text("Video streaming is not running")
-    else:
-        CameraStreamer.Stop()
-        videoStreamingThread = None
-        print("Video Streaming Stopped")
-
-
-
-
-
-
-
+    CameraStreamer.Stop()
 
 
 

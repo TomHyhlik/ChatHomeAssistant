@@ -5,6 +5,7 @@ import picamera
 import logging
 import socketserver
 from threading import Condition
+import threading
 from http import server
 import subprocess
 
@@ -25,6 +26,7 @@ PAGE="""\
 </body>
 </html>
 """
+
 
 
 class StreamingOutput(object):
@@ -99,27 +101,58 @@ def GetUrl() -> str:
 
 
 
-def Start():
-    global videoOutput
-    global server
-    global camera
-    camera = picamera.PiCamera(resolution=VIDEO_RESOLUTION, framerate=VIDEO_FRAME_RATE)
-    videoOutput = StreamingOutput()
-    camera.rotation = VIDEO_SCREEN_ROTATED
+def InitCamera():
+    """
+    Initialize the camera
+    """
+    global cameraInitialized
+    if not cameraInitialized:
+        global camera
+        global videoOutput
+        camera = picamera.PiCamera(resolution=VIDEO_RESOLUTION, framerate=VIDEO_FRAME_RATE)
+        videoOutput = StreamingOutput()
+        camera.rotation = VIDEO_SCREEN_ROTATED
+        cameraInitialized = True
     camera.start_recording(videoOutput, format='mjpeg')
+
+
+
+
+cameraInitialized = False
+
+def StartServer():
+    """
+    Start video streaming server in thread
+    """
+    global server
+    print("Starting server")
+    address = ('', HTTP_PORT)
+    server = StreamingServer(address, StreamingHandler)
+    server.serve_forever()
+
+
+
+
+def Start():
+    """
+    Start video streaming server
+    """
+    global server_thread
+    InitCamera()
+    # Setup server
     try:
-        address = ('', HTTP_PORT)
-        server = StreamingServer(address, StreamingHandler)
-        server.serve_forever()
-        print("Camera Streamer Stopped")
-    finally:
-        camera.stop_recording()
+        server_thread = threading.Thread(target=StartServer)
+        server_thread.start()
+    except:
+        print("ERROR: Failed to start video streaming server")
+
 
             
 def Stop():
     global server
+    global server_thread
     global camera
     camera.stop_recording()
     server.shutdown()
     server.server_close()
-    
+    server_thread.join()
