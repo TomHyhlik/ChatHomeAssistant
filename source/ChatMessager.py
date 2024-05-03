@@ -2,18 +2,25 @@ import os
 import subprocess
 import sys
 
-import time
+import signal
+
 
 IMAGE_NAME = "/home/pi/Pictures/telegram_request.jpg"
 
-proc_videoStream = None
+subprocessVideo = None
 
-################################ Cmd handlers
 
-def handle_cmd_unknown(update):
+
+####################################
+# Received Message Handlers        #
+####################################
+
+def Handle_Received_Unknown(update):
     print("Unsupported command")
     update.message.reply_text("Unsuported command, " +
     "type help to get all available commands")
+
+
 
 def Handle_Received_Help(update):
     update.message.reply_text("Available commands:\n" +
@@ -22,14 +29,24 @@ def Handle_Received_Help(update):
     "\"temp rpi\" \t\t Get temperature of the device\n"
     "\"humid\" \t\t Get hummidity\n"
     "\"photo\" \t\t Get photo\n"
+    "\"video start\" \t\t Start video stream\n"
+    "\"video stop\" \t\t Stop video stream\n"
     )
+
+
 
 def Handle_Received_Exit(update):
     update.message.reply_text("Bot turning off...")
     sys.exit()
 
+
+
+
 def Handle_Received_Temp(update):
     update.message.reply_text("Temperature in the room: 22.84 C")
+
+
+
 
 def Handle_Received_TempRpi(update):   
     try:
@@ -40,8 +57,14 @@ def Handle_Received_TempRpi(update):
     except:
         update.message.reply_text("ERROR: Get temperature of the RPi")
 
+
+
+
 def Handle_Received_Humid(update):
     update.message.reply_text("TODO: To be added")
+
+
+
 
 def Handle_Received_Photo(update):
     update.message.reply_text("Taking photo...")
@@ -52,10 +75,13 @@ def Handle_Received_Photo(update):
     f = open(IMAGE_NAME, "rb")
     update.message.reply_photo(f)
 
+
+
+
 def Handle_Received_VideoStart(update):
-    global proc_videoStream
+    global subprocessVideo
     update.message.reply_text("Starting video streaming...")
-    proc_videoStream = subprocess.Popen("python3 camera_surveillance_system.py &", shell=True)
+    subprocessVideo = subprocess.Popen("python3 CameraStreamer.py", shell=True)
     # Get access link
     try:
         myIpAddr = str(subprocess.check_output("hostname -I", shell=True))
@@ -68,14 +94,36 @@ def Handle_Received_VideoStart(update):
     print("link: " + link)
     update.message.reply_text(link)
 
+
+    # Kill the subprocess
+    subprocessVideo.send_signal(signal.SIGINT)  # Sends the interrupt signal (Ctrl+C)
+    # If the process does not terminate, force kill it
+    if subprocessVideo.poll() is None:  # Check if the process is still running
+        subprocessVideo.kill()  # Force kill the process
+    # Wait for the process to terminate and get the exit code
+    exit_code = subprocessVideo.wait()
+    print(f"Process exited with code {exit_code}")
+
+
+
+
+
+
 def Handle_Received_VideoStop(update):
-    global proc_videoStream
-    if proc_videoStream == None:
+    global subprocessVideo
+    if subprocessVideo == None:
         update.message.reply_text("Video streaming is not running")
     else:
+        # Kill the subprocess
+        subprocessVideo.send_signal(signal.SIGINT)  # Sends the interrupt signal (Ctrl+C)
+        # If the process does not terminate, force kill it
+        if subprocessVideo.poll() is None:  # Check if the process is still running
+            subprocessVideo.kill()  # Force kill the process
+        # Wait for the process to terminate and get the exit code
+        exit_code = subprocessVideo.wait()
+        print(f"Process exited with code {exit_code}")
+
         update.message.reply_text("Video streaming stopped")     
-        proc_videoStream.terminate()
-        proc_videoStream = None
 
 
 
@@ -93,7 +141,7 @@ def ReceivedMessageHandler(message):
         "video start":      Handle_Received_VideoStart,
         "video stop":       Handle_Received_VideoStop,
     }
-    return switcher.get(message, handle_cmd_unknown)
+    return switcher.get(message, Handle_Received_Unknown)
 
 
     

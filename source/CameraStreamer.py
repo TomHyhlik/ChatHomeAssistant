@@ -7,20 +7,23 @@ import socketserver
 from threading import Condition
 from http import server
 
+
+VIDEO_RESOLUTION = '1920x1080'
+VIDEO_FRAME_RATE = 30
+
+HTTP_PORT = 8000
+
 PAGE="""\
 <html>
 <head>
-<title>Raspberry Pi - Surveillance Camera</title>
+<title>Camera Streamer</title>
 </head>
 <body>
-<center><h1>Raspberry Pi - Surveillance Camera</h1></center>
+<center><h1>Camera Streamer</h1></center>
 <center><img src="stream.mjpg" width="1920" height="1080"></center>
 </body>
 </html>
 """
-
-# VIDEORESOLUTION = '640x480'
-VIDEORESOLUTION = '1920x1080'
 
 
 class StreamingOutput(object):
@@ -83,13 +86,13 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
 
-with picamera.PiCamera(resolution=VIDEORESOLUTION, framerate=24) as camera:
+with picamera.PiCamera(resolution=VIDEO_RESOLUTION, framerate=VIDEO_FRAME_RATE) as camera:
     output = StreamingOutput()
     #Uncomment the next line to change your Pi's Camera rotation (in degrees)
     camera.rotation = 180
     camera.start_recording(output, format='mjpeg')
     try:
-        address = ('', 8000)
+        address = ('', HTTP_PORT)
         server = StreamingServer(address, StreamingHandler)
         server.serve_forever()
     finally:
