@@ -6,10 +6,11 @@ import logging
 import socketserver
 from threading import Condition
 from http import server
-
+import subprocess
 
 VIDEO_RESOLUTION = '1920x1080'
 VIDEO_FRAME_RATE = 30
+VIDEO_SCREEN_ROTATED = 180
 
 HTTP_PORT = 8000
 
@@ -45,6 +46,7 @@ class StreamingOutput(object):
 
 class StreamingHandler(server.BaseHTTPRequestHandler):
     def do_GET(self):
+        global videoOutput
         if self.path == '/':
             self.send_response(301)
             self.send_header('Location', '/index.html')
@@ -65,9 +67,9 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.end_headers()
             try:
                 while True:
-                    with output.condition:
-                        output.condition.wait()
-                        frame = output.frame
+                    with videoOutput.condition:
+                        videoOutput.condition.wait()
+                        frame = videoOutput.frame
                     self.wfile.write(b'--FRAME\r\n')
                     self.send_header('Content-Type', 'image/jpeg')
                     self.send_header('Content-Length', len(frame))
@@ -86,14 +88,38 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
 
-with picamera.PiCamera(resolution=VIDEO_RESOLUTION, framerate=VIDEO_FRAME_RATE) as camera:
-    output = StreamingOutput()
-    #Uncomment the next line to change your Pi's Camera rotation (in degrees)
-    camera.rotation = 180
-    camera.start_recording(output, format='mjpeg')
+
+
+def GetUrl() -> str:
+    deviceIpAddr = str(subprocess.check_output("hostname -I", shell=True))
+    deviceIpAddr = deviceIpAddr[2:]
+    deviceIpAddr = deviceIpAddr[:-4]
+    return "http://"+ str(deviceIpAddr) +":"+ str(HTTP_PORT) +"/"
+
+
+
+
+def Start():
+    global videoOutput
+    global server
+    global camera
+    camera = picamera.PiCamera(resolution=VIDEO_RESOLUTION, framerate=VIDEO_FRAME_RATE)
+    videoOutput = StreamingOutput()
+    camera.rotation = VIDEO_SCREEN_ROTATED
+    camera.start_recording(videoOutput, format='mjpeg')
     try:
         address = ('', HTTP_PORT)
         server = StreamingServer(address, StreamingHandler)
         server.serve_forever()
+        print("Camera Streamer Stopped")
     finally:
         camera.stop_recording()
+
+            
+def Stop():
+    global server
+    global camera
+    camera.stop_recording()
+    server.shutdown()
+    server.server_close()
+    

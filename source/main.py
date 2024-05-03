@@ -6,6 +6,7 @@ import AppConfig
 import time
 
 
+
 def telegram_sendMessage(message):
     print("main\ttelegram send: "+ message)
     telegram_send.send(messages=[message])   
