@@ -10,57 +10,26 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
 )
 
-logger = logging.getLogger(__name__)
 
-
-# Define a few command handlers. These usually take the two arguments update and
-# context.
-def start(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /start is issued."""
-    user = update.effective_user
-    update.message.reply_markdown_v2(
-        fr'Hi {user.mention_markdown_v2()}\!',
-        reply_markup=ForceReply(selective=True),
-    )
-
-
-def help_command(update: Update, context: CallbackContext) -> None:
-    """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
-
-
-def handleTelegramRx(update: Update, context: CallbackContext) -> None:
-    print("Rx:" + update.message.text)
-    # update.message.reply_text("ur mama is " + update.message.text)
-    # IMAGE_NAME = "/home/pi/Pictures/telegram_request.jpg"
-    # f = open(IMAGE_NAME, "rb")
-    # update.message.reply_photo(f)
-
-    # cmdHandler.handleRx(update.message.text)
+def ReceivedMessageHandler(update: Update, context: CallbackContext) -> None:
+    """
+    Handle received telegram message
+    """
+    print("Telegram_Rx:" + update.message.text)
     messageHandler.handleRx(update)
 
 
-
-def init(telegram_token):
-    """Start the bot."""
+def Init(telegram_token):
+    """
+    Initialize telegram bot, listening
+    """
     # Create the Updater and pass it your bot's token.
     updater = Updater(telegram_token)
-
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
-
-    # on different commands - answer in Telegram
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("help", help_command))
-
-    # on non command i.e message
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handleTelegramRx))
-
+    # Register message handler
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, ReceivedMessageHandler))
     # Start the Bot
     updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
 

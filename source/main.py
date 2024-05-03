@@ -13,7 +13,7 @@ def telegram_sendMessage(message):
 
 def AppInit() -> None:
     telegram_sendMessage("Bot on")
-    ChatListener.init(AppConfig.AppConfig['telegram_token'])
+    ChatListener.Init(AppConfig.AppConfig['telegram_token'])
 
 
 def main() -> None:
