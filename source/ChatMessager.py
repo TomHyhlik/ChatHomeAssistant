@@ -11,6 +11,10 @@ subprocessVideo = None
 
 
 
+def init():
+    cameraStreamer = CameraStreamer.CameraStreamer()
+
+
 ####################################
 # Received Message Handlers        #
 ####################################
@@ -65,9 +69,9 @@ def Handle_Received_Photo(update):
 
 
 def Handle_Received_VideoStart(update):
-    CameraStreamer.Start()
+    cameraStreamer.start()
     try:
-        videoUrl = CameraStreamer.GetUrl()
+        videoUrl = cameraStreamer.GetUrl()
         update.message.reply_text("url: "+ videoUrl)
     except:
         update.message.reply_text("ERROR: Failed to get my IP address")
@@ -76,7 +80,7 @@ def Handle_Received_VideoStart(update):
 
 
 def Handle_Received_VideoStop(update):
-    CameraStreamer.Stop()
+    cameraStreamer.Stop()
 
 
 
@@ -101,4 +105,5 @@ def HandleReceived(update):
     Call Corresponding handler for the received message
     """
     ReceivedMessageHandler(update.message.text)(update)
+
 

@@ -91,68 +91,62 @@ class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     daemon_threads = True
 
 
+class CameraStreamer:
+    def __init__(self):
+        self.__cameraInitialized = False
+        self.camera = None
+        self.server = None
+        self.server_thread = None
 
-def GetUrl() -> str:
-    deviceIpAddr = str(subprocess.check_output("hostname -I", shell=True))
-    deviceIpAddr = deviceIpAddr[2:]
-    deviceIpAddr = deviceIpAddr[:-4]
-    return "http://"+ str(deviceIpAddr) +":"+ str(HTTP_PORT) +"/"
+    def get_url(self) -> str:
+        """
+        Get http url by which the streamed video is accessed
+        """
+        deviceIpAddr = str(subprocess.check_output("hostname -I", shell=True))
+        deviceIpAddr = deviceIpAddr[2:]
+        deviceIpAddr = deviceIpAddr[:-4]
+        return f"http://{deviceIpAddr}:{HTTP_PORT}/"
 
-
-
-
-def InitCamera():
-    """
-    Initialize the camera
-    """
-    global cameraInitialized
-    if not cameraInitialized:
-        global camera
+    def init_camera(self):
+        """
+        Initialize the camera
+        """
         global videoOutput
-        camera = picamera.PiCamera(resolution=VIDEO_RESOLUTION, framerate=VIDEO_FRAME_RATE)
-        videoOutput = StreamingOutput()
-        camera.rotation = VIDEO_SCREEN_ROTATED
-        cameraInitialized = True
-    camera.start_recording(videoOutput, format='mjpeg')
+        if not self.__cameraInitialized:
+            self.camera = picamera.PiCamera(resolution=VIDEO_RESOLUTION, framerate=VIDEO_FRAME_RATE)
+            videoOutput = StreamingOutput()
+            self.camera.rotation = VIDEO_SCREEN_ROTATED
+            self.__cameraInitialized = True
+        self.camera.start_recording(videoOutput, format='mjpeg')
 
+    def start_server(self):
+        """
+        Start video streaming server in thread
+        """
+        print("Starting server")
+        address = ('', HTTP_PORT)
+        self.server = StreamingServer(address, StreamingHandler)
+        self.server.serve_forever()
 
-
-
-cameraInitialized = False
-
-def StartServer():
-    """
-    Start video streaming server in thread
-    """
-    global server
-    print("Starting server")
-    address = ('', HTTP_PORT)
-    server = StreamingServer(address, StreamingHandler)
-    server.serve_forever()
-
-
-
-
-def Start():
-    """
-    Start video streaming server
-    """
-    global server_thread
-    InitCamera()
-    # Setup server
-    try:
-        server_thread = threading.Thread(target=StartServer)
-        server_thread.start()
-    except:
-        print("ERROR: Failed to start video streaming server")
-
-
-            
-def Stop():
-    global server
-    global server_thread
-    global camera
-    camera.stop_recording()
-    server.shutdown()
-    server.server_close()
-    server_thread.join()
+    def start(self):
+        """
+        Start video streaming server
+        """
+        self.init_camera()
+        try:
+            self.server_thread = threading.Thread(target=self.start_server)
+            self.server_thread.start()
+        except Exception as e:
+            print("ERROR: Failed to start video streaming server:", e)
+                
+    def stop(self):
+        """
+        Stop video streaming server
+        """
+        if self.camera:
+            self.camera.stop_recording()
+        if self.server:
+            self.server.shutdown()
+            self.server.server_close()
+        if self.server_thread:
+            self.server_thread.join()

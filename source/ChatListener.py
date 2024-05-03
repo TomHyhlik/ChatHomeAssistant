@@ -29,3 +29,5 @@ def Init(telegram_token):
     updater.start_polling()
     updater.idle()
 
+    ChatMessager.init()
+
