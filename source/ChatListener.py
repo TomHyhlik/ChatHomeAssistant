@@ -1,14 +1,10 @@
+"""
+Telegram Chat Bot handler
+"""
+
 import ChatMessager
-
-
-import logging
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-
-# Enable logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
 
 
 def CallbackTelegramReceivedMessage(update: Update, context: CallbackContext) -> None:
@@ -21,7 +17,7 @@ def CallbackTelegramReceivedMessage(update: Update, context: CallbackContext) ->
 
 def Init(telegram_token):
     """
-    Initialize telegram bot, listening
+    Initialize telegram bot to process and respond to received messages
     """
     # Create the Updater and pass it your bot's token.
     updater = Updater(telegram_token)

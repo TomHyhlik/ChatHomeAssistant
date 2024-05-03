@@ -78,7 +78,7 @@ def handle_cmd_video_stop(update):
         proc_videoStream = None
 
 
-################################ Handle Cmd
+
 def handleCmd(argument):
     switcher = {
         "help":             handle_cmd_help,
