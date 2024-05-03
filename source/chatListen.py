@@ -1,4 +1,4 @@
-import source.messageHandler as messageHandler
+import messageHandler
 
 
 import logging

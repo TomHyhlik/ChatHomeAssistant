@@ -16,7 +16,6 @@ def AppInit() -> None:
     chatListen.init(AppConfig.AppConfig['telegram_token'])
 
 
-
 def main() -> None:
     if (AppConfig.AppConfig['debug']):
         AppInit()
