@@ -15,7 +15,7 @@ def handle_cmd_unknown(update):
     update.message.reply_text("Unsuported command, " +
     "type help to get all available commands")
 
-def handle_cmd_help(update):
+def Handle_Received_Help(update):
     update.message.reply_text("Available commands:\n" +
     "\"exit\" \t\t Shut down the bot\n"
     "\"temp\" \t\t Get temperature of the room\n"
@@ -24,14 +24,14 @@ def handle_cmd_help(update):
     "\"photo\" \t\t Get photo\n"
     )
 
-def handle_cmd_exit(update):
+def Handle_Received_Exit(update):
     update.message.reply_text("Bot turning off...")
     sys.exit()
 
-def handle_cmd_temp(update):
+def Handle_Received_Temp(update):
     update.message.reply_text("Temperature in the room: 22.84 C")
 
-def handle_cmd_tempRpi(update):   
+def Handle_Received_TempRpi(update):   
     try:
         rsp = str(subprocess.check_output("vcgencmd measure_temp", shell=True))
         import re
@@ -40,10 +40,10 @@ def handle_cmd_tempRpi(update):
     except:
         update.message.reply_text("ERROR: Get temperature of the RPi")
 
-def handle_cmd_humidity(update):
+def Handle_Received_Humid(update):
     update.message.reply_text("TODO: To be added")
 
-def handle_cmd_photo(update):
+def Handle_Received_Photo(update):
     update.message.reply_text("Taking photo...")
     if os.system("raspistill -o " + IMAGE_NAME) != 0: # -vf flag for flip
         update.message.reply_text("Camera Unavailable")
@@ -52,7 +52,7 @@ def handle_cmd_photo(update):
     f = open(IMAGE_NAME, "rb")
     update.message.reply_photo(f)
 
-def handle_cmd_video_start(update):
+def Handle_Received_VideoStart(update):
     global proc_videoStream
     update.message.reply_text("Starting video streaming...")
     proc_videoStream = subprocess.Popen("python3 camera_surveillance_system.py &", shell=True)
@@ -68,7 +68,7 @@ def handle_cmd_video_start(update):
     print("link: " + link)
     update.message.reply_text(link)
 
-def handle_cmd_video_stop(update):
+def Handle_Received_VideoStop(update):
     global proc_videoStream
     if proc_videoStream == None:
         update.message.reply_text("Video streaming is not running")
@@ -79,21 +79,27 @@ def handle_cmd_video_stop(update):
 
 
 
-def handleCmd(argument):
+def ReceivedMessageHandler(message):
+    """
+    Return corresponding handler based on the message
+    """
     switcher = {
-        "help":             handle_cmd_help,
-        "exit":             handle_cmd_exit,
-        "temp":             handle_cmd_temp,
-        "temp rpi":         handle_cmd_tempRpi,
-        "humid":            handle_cmd_humidity,
-        "photo":            handle_cmd_photo,
-        "video start":      handle_cmd_video_start,
-        "video stop":       handle_cmd_video_stop,
+        "help":             Handle_Received_Help,
+        "exit":             Handle_Received_Exit,
+        "temp":             Handle_Received_Temp,
+        "temp rpi":         Handle_Received_TempRpi,
+        "humid":            Handle_Received_Humid,
+        "photo":            Handle_Received_Photo,
+        "video start":      Handle_Received_VideoStart,
+        "video stop":       Handle_Received_VideoStop,
     }
-    return switcher.get(argument, handle_cmd_unknown)
+    return switcher.get(message, handle_cmd_unknown)
 
 
     
 def HandleReceived(update):
-    handleCmd(update.message.text)(update)
+    """
+    Call Corresponding handler for the received message
+    """
+    ReceivedMessageHandler(update.message.text)(update)
 
