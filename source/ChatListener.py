@@ -1,4 +1,4 @@
-import messageHandler
+import ChatMessager
 
 
 import logging
@@ -16,7 +16,7 @@ def CallbackTelegramReceivedMessage(update: Update, context: CallbackContext) ->
     Called when new telegram message received
     """
     print("Telegram_Rx:" + update.message.text)
-    messageHandler.handleRx(update)
+    ChatMessager.HandleReceived(update)
 
 
 def Init(telegram_token):

@@ -94,7 +94,6 @@ def handleCmd(argument):
 
 
     
-################################ Handle Rx
-def handleRx(update):
+def HandleReceived(update):
     handleCmd(update.message.text)(update)
 
