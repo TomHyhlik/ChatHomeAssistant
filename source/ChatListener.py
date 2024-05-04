@@ -11,14 +11,19 @@ def CallbackTelegramReceivedMessage(update: Update, context: CallbackContext) ->
     """
     Called when new telegram message received
     """
+    global chatMessager
     print("Telegram_Rx:" + update.message.text)
-    ChatMessager.HandleReceived(update)
+    chatMessager.HandleReceived(update)
 
 
 def Init(telegram_token):
     """
     Initialize telegram bot to process and respond to received messages
     """
+    global chatMessager
+    chatMessager = ChatMessager.ChatMessager()
+
+
     # Create the Updater and pass it your bot's token.
     updater = Updater(telegram_token)
     # Get the dispatcher to register handlers
@@ -28,6 +33,3 @@ def Init(telegram_token):
     # Start the Bot
     updater.start_polling()
     updater.idle()
-
-    ChatMessager.init()
-
