@@ -58,7 +58,7 @@ class ChatMessager:
     def handle_message_videoStart(self, update):
         self.cameraStreamer.start()
         try:
-            videoUrl = self.cameraStreamer.GetUrl()
+            videoUrl = self.cameraStreamer.get_url()
             update.message.reply_text("url: "+ videoUrl)
         except:
             update.message.reply_text("ERROR: Failed to get my IP address")
