@@ -1,9 +1,6 @@
 import os
 import subprocess
-import sys
-import signal
 import CameraStreamer
-import time
 
 IMAGE_NAME = "/home/pi/Pictures/telegram_request.jpg"
 
