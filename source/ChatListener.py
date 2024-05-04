@@ -13,7 +13,7 @@ def CallbackTelegramReceivedMessage(update: Update, context: CallbackContext) ->
     """
     global chatMessager
     print("Telegram_Rx:" + update.message.text)
-    chatMessager.HandleReceived(update)
+    chatMessager.handle_received_message(update)
 
 
 def Init(telegram_token):

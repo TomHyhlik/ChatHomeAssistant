@@ -19,12 +19,12 @@ class ChatMessager:
     # Received Message Handlers        #
     ####################################
 
-    def Handle_Received_Unknown(self, update):
+    def handle_message_unknown(self, update):
         print("Unsupported command")
         update.message.reply_text("Unsuported command, " +
         "type help to get all available commands")
 
-    def Handle_Received_Help(self, update):
+    def handle_message_help(self, update):
         update.message.reply_text("Available commands:\n" +
         "\"exit\" \t\t Shut down the bot\n"
         "\"temp\" \t\t Get temperature of the room\n"
@@ -33,11 +33,11 @@ class ChatMessager:
         "\"video stop\" \t\t Stop video stream\n"
         )
 
-    def Handle_Received_Exit(self, update):
+    def handle_message_exit(self, update):
         update.message.reply_text("Bot turning off...")
         exit()
 
-    def Handle_Received_Temp(self, update):   
+    def handle_message_temp(self, update):   
         try:
             rsp = str(subprocess.check_output("vcgencmd measure_temp", shell=True))
             import re
@@ -46,7 +46,7 @@ class ChatMessager:
         except:
             update.message.reply_text("ERROR: Get temperature of the RPi")
 
-    def Handle_Received_Photo(self, update):
+    def handle_message_photo(self, update):
         update.message.reply_text("Taking photo...")
         if os.system("raspistill -o " + IMAGE_NAME) != 0: # -vf flag for flip
             update.message.reply_text("Camera Unavailable")
@@ -55,7 +55,7 @@ class ChatMessager:
         f = open(IMAGE_NAME, "rb")
         update.message.reply_photo(f)
 
-    def Handle_Received_VideoStart(self, update):
+    def handle_message_videoStart(self, update):
         self.cameraStreamer.start()
         try:
             videoUrl = self.cameraStreamer.GetUrl()
@@ -64,29 +64,29 @@ class ChatMessager:
             update.message.reply_text("ERROR: Failed to get my IP address")
 
 
-    def Handle_Received_VideoStop(self, update):
+    def handle_message_videoStop(self, update):
         self.cameraStreamer.stop()
+        update.message.reply_text("Video streaming stopped")
 
 
-
-    def ReceivedMessageHandler(self, message):
+    def received_message_handlers(self, message):
         """
         Return corresponding handler based on the message
         """
         switcher = {
-            "help":             self.Handle_Received_Help,
-            "exit":             self.Handle_Received_Exit,
-            "temp":             self.Handle_Received_Temp,
-            "photo":            self.Handle_Received_Photo,
-            "video start":      self.Handle_Received_VideoStart,
-            "video stop":       self.Handle_Received_VideoStop,
+            "help":             self.handle_message_help,
+            "exit":             self.handle_message_exit,
+            "temp":             self.handle_message_temp,
+            "photo":            self.handle_message_photo,
+            "video start":      self.handle_message_videoStart,
+            "video stop":       self.handle_message_videoStop,
         }
-        return switcher.get(message, self.Handle_Received_Unknown)
+        return switcher.get(message, self.handle_message_unknown)
 
-    def HandleReceived(self, update):
+    def handle_received_message(self, update):
         """
         Call Corresponding handler for the received message
         """
-        self.ReceivedMessageHandler(update.message.text)(update)
+        self.received_message_handlers(update.message.text)(update)
 
 
