@@ -12,20 +12,19 @@ subprocessVideo = None
 
 
 class   ChatMessager:
+    """
+    Receive and handle messages from ChatCommunicator
+    """
     def __init__(self, chatCommunicator) -> None:
-
         self.chatCommunicator = chatCommunicator
+        self.chatCommunicator.register_callback_on_received_message(self.callback_on_received_message)
+        self.cameraStreamer = CameraStreamer.CameraStreamer()
 
-        self.chatCommunicator.set_callback_received(self.callback_aa)
-
-    def callback_aa(self, handle, message):
-
-
-        self.handle_received_message(handle, message)
-
-        # self.chatCommunicator.send(handle, "message")
-
-
+    def callback_on_received_message(self, handle, message):
+        """
+        Callback called on chat message received
+        """
+        self.received_message_handlers(message)(handle)
 
     ####################################
     # Received Message Handlers        #
@@ -94,11 +93,5 @@ class   ChatMessager:
             "video stop":       self.handle_message_videoStop,
         }
         return switcher.get(message, self.handle_message_unknown)
-
-    def handle_received_message(self, handle, message):
-        """
-        Call Corresponding handler for the received message
-        """
-        self.received_message_handlers(message)(handle)
 
 

@@ -15,7 +15,7 @@ def telegram_send_init_message(message):
 def AppInit() -> None:
     telegram_send_init_message("Bot on")
     # Create telegram chat communicator
-    chatCOmmunicator = ChatCommunicator.ChatCommunicator(AppConfig.AppConfig['telegram_token'])
+    chatCOmmunicator = ChatCommunicator.TelegramChatCommunicator(AppConfig.AppConfig['telegram_token'])
     # Create message handler
     chatMessager = ChatMessager.ChatMessager(chatCOmmunicator)
     # Start the chat bot listening
