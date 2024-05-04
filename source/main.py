@@ -14,8 +14,8 @@ def telegram_sendMessage(message):
 
 def AppInit() -> None:
     telegram_sendMessage("Bot on")
-    ChatListener.Init(AppConfig.AppConfig['telegram_token'])
-
+    chatListener = ChatListener.ChatListener()
+    chatListener.listen(AppConfig.AppConfig['telegram_token'])
 
 def main() -> None:
     if (AppConfig.AppConfig['debug']):
