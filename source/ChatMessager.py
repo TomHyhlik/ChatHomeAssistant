@@ -71,11 +71,9 @@ class   ChatMessager:
         except:
             self.chatCommunicator.send_reply_message_text(handle, "ERROR: Failed to get my IP address")
 
-
     def handle_message_videoStop(self, handle):
         self.cameraStreamer.stop()
         self.chatCommunicator.send_reply_message_text(handle, "Video streaming stopped")
-
 
     def received_message_handlers(self, message):
         """

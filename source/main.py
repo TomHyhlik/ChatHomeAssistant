@@ -13,7 +13,6 @@ def telegram_send_init_message(message):
     print(LOG_NAME + " message send: "+ message)
     telegram_send.send(messages=[message])   
 
-
 def AppInit() -> None:
     telegram_send_init_message("Bot on")
     # Create telegram chat communicator
@@ -22,8 +21,6 @@ def AppInit() -> None:
     chatMessager = ChatMessager.ChatMessager(chatCOmmunicator)
     # Start the chat bot listening
     chatCOmmunicator.listen()
-
-
 
 def main() -> None:
     if (AppConfig.AppConfig['debug']):
