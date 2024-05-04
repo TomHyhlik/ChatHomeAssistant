@@ -24,9 +24,14 @@ class TelegramChatCommunicator:
         self.on_received_message(handle, handle.message.text)
 
 
-    def message_reply(self, handle, message):
+    def send_reply_message_text(self, handle, message):
         print("Telegram send:\t" + message)
         handle.message.reply_text(message)
+
+
+    def send_reply_message_photo(self, handle, file):
+        print("Telegram send:\tphoto")
+        handle.message.reply_photo(file)
 
 
     def listen(self, ):

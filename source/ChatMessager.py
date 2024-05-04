@@ -32,11 +32,11 @@ class   ChatMessager:
 
     def handle_message_unknown(self, handle):
         print("Unsupported command")
-        handle.message.reply_text("Unsuported command, " +
+        self.chatCommunicator.send_reply_message_text(handle, "Unsuported command, " +
         "type help to get all available commands")
 
     def handle_message_help(self, handle):
-        handle.message.reply_text("Available commands:\n" +
+        self.chatCommunicator.send_reply_message_text(handle, "Available commands:\n" +
         "\"exit\" \t\t Shut down the bot\n"
         "\"temp\" \t\t Get temperature of the room\n"
         "\"photo\" \t\t Get photo\n"
@@ -45,7 +45,7 @@ class   ChatMessager:
         )
 
     def handle_message_exit(self, handle):
-        handle.message.reply_text("Bot turning off...")
+        self.chatCommunicator.send_reply_message_text(handle, "Bot turning off...")
         exit()
 
     def handle_message_temp(self, handle):   
@@ -53,31 +53,31 @@ class   ChatMessager:
             rsp = str(subprocess.check_output("vcgencmd measure_temp", shell=True))
             import re
             val = re.findall("\d+\.\d+", rsp)[0]
-            handle.message.reply_text("Temperature of the RPi: " + str(val) + " C")
+            self.chatCommunicator.send_reply_message_text(handle, "Temperature of the RPi: " + str(val) + " C")
         except:
-            handle.message.reply_text("ERROR: Get temperature of the RPi")
+            self.chatCommunicator.send_reply_message_text(handle, "ERROR: Get temperature of the RPi")
 
     def handle_message_photo(self, handle):
-        handle.message.reply_text("Taking photo...")
+        self.chatCommunicator.send_reply_message_text(handle, "Taking photo...")
         if os.system("raspistill -o " + IMAGE_NAME) != 0: # -vf flag for flip
-            handle.message.reply_text("Camera Unavailable")
+            self.chatCommunicator.send_reply_message_text(handle, "Camera Unavailable")
             return
-        handle.message.reply_text("Sending the photo...")
+        self.chatCommunicator.send_reply_message_text(handle, "Sending the photo...")
         f = open(IMAGE_NAME, "rb")
-        handle.message.reply_photo(f)
+        self.chatCommunicator.send_reply_message_photo(handle, f)
 
     def handle_message_videoStart(self, handle):
         self.cameraStreamer.start()
         try:
             videoUrl = self.cameraStreamer.get_url()
-            handle.message.reply_text("url: "+ videoUrl)
+            self.chatCommunicator.send_reply_message_text(handle, "url: "+ videoUrl)
         except:
-            handle.message.reply_text("ERROR: Failed to get my IP address")
+            self.chatCommunicator.send_reply_message_text(handle, "ERROR: Failed to get my IP address")
 
 
     def handle_message_videoStop(self, handle):
         self.cameraStreamer.stop()
-        handle.message.reply_text("Video streaming stopped")
+        self.chatCommunicator.send_reply_message_text(handle, "Video streaming stopped")
 
 
     def received_message_handlers(self, message):
