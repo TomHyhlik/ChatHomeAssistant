@@ -16,12 +16,12 @@ class TelegramChatCommunicator:
         self.on_received_message = callback
 
 
-    def __callback_message_received(self, update: Update, context: CallbackContext) -> None:
+    def __callback_message_received(self, handle: Update, context: CallbackContext) -> None:
         """
         Called when new telegram message received
         """
-        print("Telegram received:\t" + update.message.text)
-        self.on_received_message(update, update.message.text)
+        print("Telegram received:\t" + handle.message.text)
+        self.on_received_message(handle, handle.message.text)
 
 
     def message_reply(self, handle, message):
