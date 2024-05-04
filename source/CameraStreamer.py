@@ -27,7 +27,7 @@ PAGE="""\
 </html>
 """
 
-
+LOG_NAME = "CAM "
 
 class StreamingOutput(object):
     def __init__(self):
@@ -123,7 +123,7 @@ class CameraStreamer:
         """
         Start video streaming server in thread
         """
-        print("Starting server")
+        print(LOG_NAME + "Starting server")
         address = ('', HTTP_PORT)
         self.server = StreamingServer(address, StreamingHandler)
         self.server.serve_forever()
@@ -137,7 +137,7 @@ class CameraStreamer:
             self.server_thread = threading.Thread(target=self.start_server)
             self.server_thread.start()
         except Exception as e:
-            print("ERROR: Failed to start video streaming server:", e)
+            print(LOG_NAME + "ERROR: Failed to start video streaming server:", e)
                 
     def stop(self):
         """

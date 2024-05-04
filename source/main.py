@@ -7,8 +7,10 @@ import time
 import ChatMessager
 
 
+LOG_NAME = "MAI "
+
 def telegram_send_init_message(message):
-    print("main\ttelegram send: "+ message)
+    print(LOG_NAME + " message send: "+ message)
     telegram_send.send(messages=[message])   
 
 
@@ -32,7 +34,7 @@ def main() -> None:
                 AppInit()
                 break
             except:
-                print("Failed to init telegram bot")
+                print(LOG_NAME +" Failed to init telegram bot")
                 time.sleep(10)
         
 if __name__ == '__main__':

@@ -7,9 +7,9 @@ import time
 
 IMAGE_NAME = "/home/pi/Pictures/telegram_request.jpg"
 
+LOG_NAME = "CHM "
+
 subprocessVideo = None
-
-
 
 class   ChatMessager:
     """
@@ -31,7 +31,7 @@ class   ChatMessager:
     ####################################
 
     def handle_message_unknown(self, handle):
-        print("Unsupported command")
+        print(LOG_NAME + "Unsupported command")
         self.chatCommunicator.send_reply_message_text(handle, "Unsuported command, " +
         "type help to get all available commands")
 

@@ -6,6 +6,8 @@ from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
 
+LOG_NAME = "TEL "
+
 
 class TelegramChatCommunicator:
     def __init__(self, telegram_token):
@@ -20,17 +22,17 @@ class TelegramChatCommunicator:
         """
         Called when new telegram message received
         """
-        print("Telegram received:\t" + handle.message.text)
+        print(LOG_NAME + "message received:\t" + handle.message.text)
         self.on_received_message(handle, handle.message.text)
 
 
     def send_reply_message_text(self, handle, message):
-        print("Telegram send:\t" + message)
+        print(LOG_NAME + "message send:\t" + message)
         handle.message.reply_text(message)
 
 
     def send_reply_message_photo(self, handle, file):
-        print("Telegram send:\tphoto")
+        print(LOG_NAME + "photo send")
         handle.message.reply_photo(file)
 
 
