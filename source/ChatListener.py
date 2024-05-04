@@ -13,7 +13,7 @@ class ChatListener:
         self.chatMessager = None
 
 
-    def CallbackTelegramReceivedMessage(self, update: Update, context: CallbackContext) -> None:
+    def __callback_message_received(self, update: Update, context: CallbackContext) -> None:
         """
         Called when new telegram message received
         """
@@ -31,7 +31,7 @@ class ChatListener:
         # Get the dispatcher to register handlers
         dispatcher = updater.dispatcher
         # Register message handler
-        dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, self.CallbackTelegramReceivedMessage))
+        dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, self.__callback_message_received))
         # Start the Bot
         updater.start_polling()
         updater.idle()
