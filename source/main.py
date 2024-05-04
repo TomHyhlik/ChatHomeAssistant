@@ -1,21 +1,27 @@
 #!/usr/bin/env python3
 
 import telegram_send
-import ChatListener
+import ChatCommunicator
 import AppConfig
 import time
+import ChatMessager
 
 
-
-def telegram_sendMessage(message):
+def telegram_send_init_message(message):
     print("main\ttelegram send: "+ message)
     telegram_send.send(messages=[message])   
 
 
 def AppInit() -> None:
-    telegram_sendMessage("Bot on")
-    chatListener = ChatListener.ChatListener()
-    chatListener.listen(AppConfig.AppConfig['telegram_token'])
+    telegram_send_init_message("Bot on")
+    # Create telegram chat communicator
+    chatCOmmunicator = ChatCommunicator.ChatCommunicator(AppConfig.AppConfig['telegram_token'])
+    # Create message handler
+    chatMessager = ChatMessager.ChatMessager(chatCOmmunicator)
+    # Start the chat bot listening
+    chatCOmmunicator.listen()
+
+
 
 def main() -> None:
     if (AppConfig.AppConfig['debug']):

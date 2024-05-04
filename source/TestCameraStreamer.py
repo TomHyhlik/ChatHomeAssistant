@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import telegram_send
-import ChatListener
 import AppConfig
 import time
 import CameraStreamer

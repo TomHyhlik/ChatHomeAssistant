@@ -11,21 +11,33 @@ subprocessVideo = None
 
 
 
-class ChatMessager:
-    def __init__(self) -> None:
-        self.cameraStreamer = CameraStreamer.CameraStreamer()
+class   ChatMessager:
+    def __init__(self, chatCommunicator) -> None:
+
+        self.chatCommunicator = chatCommunicator
+
+        self.chatCommunicator.set_callback_received(self.callback_aa)
+
+    def callback_aa(self, handle, message):
+
+
+        self.handle_received_message(handle, message)
+
+        # self.chatCommunicator.send(handle, "message")
+
+
 
     ####################################
     # Received Message Handlers        #
     ####################################
 
-    def handle_message_unknown(self, update):
+    def handle_message_unknown(self, handle):
         print("Unsupported command")
-        update.message.reply_text("Unsuported command, " +
+        handle.message.reply_text("Unsuported command, " +
         "type help to get all available commands")
 
-    def handle_message_help(self, update):
-        update.message.reply_text("Available commands:\n" +
+    def handle_message_help(self, handle):
+        handle.message.reply_text("Available commands:\n" +
         "\"exit\" \t\t Shut down the bot\n"
         "\"temp\" \t\t Get temperature of the room\n"
         "\"photo\" \t\t Get photo\n"
@@ -33,40 +45,40 @@ class ChatMessager:
         "\"video stop\" \t\t Stop video stream\n"
         )
 
-    def handle_message_exit(self, update):
-        update.message.reply_text("Bot turning off...")
+    def handle_message_exit(self, handle):
+        handle.message.reply_text("Bot turning off...")
         exit()
 
-    def handle_message_temp(self, update):   
+    def handle_message_temp(self, handle):   
         try:
             rsp = str(subprocess.check_output("vcgencmd measure_temp", shell=True))
             import re
             val = re.findall("\d+\.\d+", rsp)[0]
-            update.message.reply_text("Temperature of the RPi: " + str(val) + " C")
+            handle.message.reply_text("Temperature of the RPi: " + str(val) + " C")
         except:
-            update.message.reply_text("ERROR: Get temperature of the RPi")
+            handle.message.reply_text("ERROR: Get temperature of the RPi")
 
-    def handle_message_photo(self, update):
-        update.message.reply_text("Taking photo...")
+    def handle_message_photo(self, handle):
+        handle.message.reply_text("Taking photo...")
         if os.system("raspistill -o " + IMAGE_NAME) != 0: # -vf flag for flip
-            update.message.reply_text("Camera Unavailable")
+            handle.message.reply_text("Camera Unavailable")
             return
-        update.message.reply_text("Sending the photo...")
+        handle.message.reply_text("Sending the photo...")
         f = open(IMAGE_NAME, "rb")
-        update.message.reply_photo(f)
+        handle.message.reply_photo(f)
 
-    def handle_message_videoStart(self, update):
+    def handle_message_videoStart(self, handle):
         self.cameraStreamer.start()
         try:
             videoUrl = self.cameraStreamer.get_url()
-            update.message.reply_text("url: "+ videoUrl)
+            handle.message.reply_text("url: "+ videoUrl)
         except:
-            update.message.reply_text("ERROR: Failed to get my IP address")
+            handle.message.reply_text("ERROR: Failed to get my IP address")
 
 
-    def handle_message_videoStop(self, update):
+    def handle_message_videoStop(self, handle):
         self.cameraStreamer.stop()
-        update.message.reply_text("Video streaming stopped")
+        handle.message.reply_text("Video streaming stopped")
 
 
     def received_message_handlers(self, message):
@@ -83,10 +95,10 @@ class ChatMessager:
         }
         return switcher.get(message, self.handle_message_unknown)
 
-    def handle_received_message(self, update):
+    def handle_received_message(self, handle, message):
         """
         Call Corresponding handler for the received message
         """
-        self.received_message_handlers(update.message.text)(update)
+        self.received_message_handlers(message)(handle)
 
 
