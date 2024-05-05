@@ -4,21 +4,31 @@ import telegram_send
 import ChatCommunicator
 import AppConfig
 import time
+import threading
 import ChatMessager
-
+import PirHandler
 
 LOG_NAME = "MAI "
 
-def telegram_send_init_message(message):
-    print(LOG_NAME + " message send: "+ message)
+def telegram_send_message(message):
+    print(LOG_NAME + " message send:\t" + message)
     telegram_send.send(messages=[message])   
 
+def handle_pir_trigger():
+    telegram_send_message("Motion detected!")
+
 def AppInit() -> None:
-    telegram_send_init_message("Chat Home Asistant Started")
+    telegram_send_message("Chat Home Asistant Started")
     # Telegram send whole app configuration
     with open('AppConfig.py', 'r') as configFile:
         configContent = configFile.read()
-        telegram_send_init_message(configContent)
+        telegram_send_message(configContent)
+    if AppConfig.AppConfig['pir_sensor_enabled']:
+        pirHandler = PirHandler.PirHandler(int(AppConfig.AppConfig['pir_sensor_gpio']))
+        pirHandler.register_callback(handle_pir_trigger)
+        # Run the PirHandler in thread so it is not blocking
+        thread = threading.Thread(target=pirHandler.start)
+        thread.start()
     # Create telegram chat communicator
     chatCOmmunicator = ChatCommunicator.TelegramChatCommunicator(AppConfig.AppConfig['telegram_token'])
     # Create message handler
