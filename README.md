@@ -11,6 +11,8 @@ File named AppConfig.py must be added to source directory with the content below
 
 AppConfig = {
     "debug": "False",
+    'pir_sensor_enabled': 'True',
+    'pir_sensor_gpio': '16',
     'bluetooth_enabled': 'False',
     'telegram_token': 'YOUR_TELEGRAM_ACCOUNT_TOKEN',
     'ble_scanner_fifo': '/tmp/ble_scanner_fifo'

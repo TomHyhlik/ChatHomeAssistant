@@ -14,13 +14,18 @@ def telegram_send_init_message(message):
     telegram_send.send(messages=[message])   
 
 def AppInit() -> None:
-    telegram_send_init_message("Bot on")
+    telegram_send_init_message("Chat Home Asistant Started")
+    # Telegram send whole app configuration
+    with open('AppConfig.py', 'r') as configFile:
+        configContent = configFile.read()
+        telegram_send_init_message(configContent)
     # Create telegram chat communicator
     chatCOmmunicator = ChatCommunicator.TelegramChatCommunicator(AppConfig.AppConfig['telegram_token'])
     # Create message handler
     chatMessager = ChatMessager.ChatMessager(chatCOmmunicator)
     # Start the chat bot listening
     chatCOmmunicator.listen()
+
 
 def main() -> None:
     if (AppConfig.AppConfig['debug']):
