@@ -8,6 +8,8 @@ import threading
 import ChatMessager
 import PirHandler
 
+APP_CONFIG_FILE = "/home/pi/Repos/ChatHomeAssistant/source/AppConfig.py"
+
 LOG_NAME = "MAI "
 
 def telegram_send_message(message):
@@ -20,7 +22,7 @@ def handle_pir_trigger():
 def AppInit() -> None:
     telegram_send_message("Chat Home Asistant Started")
     # Telegram send whole app configuration
-    with open('AppConfig.py', 'r') as configFile:
+    with open(APP_CONFIG_FILE, 'r') as configFile:
         configContent = configFile.read()
         telegram_send_message(configContent)
     if AppConfig.AppConfig['pir_sensor_enabled']:
